@@ -3,7 +3,10 @@ import selectorlib
 import os
 import time
 from datetime import datetime
+import sqlite3
 
+
+connection = sqlite3.connect("data.db")
 
 URL = "http://programmer100.pythonanywhere.com/"
 
@@ -23,12 +26,11 @@ def extract(source):
 
 
 def store(extracted):
-    """Stores the event in a txt file"""
-    now = datetime.now()
-    content = now.strftime("%y-%m-%d-%H-%M-%S") + "," + extracted
-    with open("data.txt", "a") as file:
-        file.write(content + "\n")
-
+    """Stores the event in a SQLite database"""
+    now = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO temperatures VALUES(?,?)", (now, extracted))
+    connection.commit()
 
 if __name__ == "__main__":
     scraped = scrape(URL)
